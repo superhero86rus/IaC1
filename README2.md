@@ -23,3 +23,8 @@ config.vm.provision "provision_once", type: "shell", inline: ...
 # Выполнится каждый раз при старте машины благодаря run: "always"
 config.vm.provision "provision_onstart", run: "always", type: "shell", 
 ```
+
+### Проверка скриптов shell
+```bash
+apt install shellcheck
+```

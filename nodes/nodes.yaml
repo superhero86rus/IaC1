@@ -1,0 +1,6 @@
+- name: "node1"
+  ip: "201"
+- name: "node2"
+  ip: "202"
+- name: "node3"
+  ip: "203"

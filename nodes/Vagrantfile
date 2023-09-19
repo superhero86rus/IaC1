@@ -1,31 +1,33 @@
-X = "13"
+X = "8"
+
+require 'yaml'
+nodes = YAML.load_file("./nodes.yaml")
 
 Vagrant.configure("2") do |config|
 
 ### My config ###
-
-  config.vm.box = "specialist/ubuntu20"
-
-  config.vm.post_up_message = "This is X: " + X
-
-  config.vm.hostname = "node1.corp" + X + ".un"
-  config.vm.network "private_network", 
-    adapter: 2, 
-    name: "VirtualBox Host-Only Ethernet Adapter",
-    ip: "192.168." + X + ".201"
+nodes.each do |opts| 
+  config.vm.define opts["name"] do |config|
+    config.vm.network "private_network", 
+      adapter: 2, 
+      name: "VirtualBox Host-Only Ethernet Adapter",
+      ip: "192.168." + X + "." + opts["ip"]
+    config.vm.hostname = opts["name"]
   
-  config.vm.provider "virtualbox" do |vb|
-    vb.memory = "2048"
-    vb.cpus = "2"
+    config.vm.provider :virtualbox do |vb|
+      # vb.name = opts["name"]
+      vb.memory = "2048"
+      vb.cpus = "2"
 
-#    file_to_disk = config.vm.hostname + '_disk2.vdi'
-#    unless File.exist?(file_to_disk)
-#      vb.customize ['createhd', '--filename', file_to_disk, '--size', 4 * 1024]
-#    end
-#    vb.customize ['storageattach', :id, '--storagectl', 'SATA', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', file_to_disk]
+      # file_to_disk = opts["name"] + '_2.vdi'
+      # unless File.exist?(file_to_disk)
+        # vb.customize ['createhd', '--filename', file_to_disk, '--size', 4 * 1024]
+      # end
+      # vb.customize ['storageattach', :id, '--storagectl', 'SATA', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', file_to_disk]
 
+    end
   end
-  
+end
 ### /My config ###
 
 ### My provision ###

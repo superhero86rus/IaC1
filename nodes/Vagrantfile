@@ -1,0 +1,41 @@
+X = "13"
+
+Vagrant.configure("2") do |config|
+
+### My config ###
+
+  config.vm.box = "specialist/ubuntu20"
+
+  config.vm.post_up_message = "This is X: " + X
+
+  config.vm.hostname = "node1.corp" + X + ".un"
+  config.vm.network "private_network", 
+    adapter: 2, 
+    name: "VirtualBox Host-Only Ethernet Adapter",
+    ip: "192.168." + X + ".201"
+  
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "2048"
+    vb.cpus = "2"
+
+#    file_to_disk = config.vm.hostname + '_disk2.vdi'
+#    unless File.exist?(file_to_disk)
+#      vb.customize ['createhd', '--filename', file_to_disk, '--size', 4 * 1024]
+#    end
+#    vb.customize ['storageattach', :id, '--storagectl', 'SATA', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', file_to_disk]
+
+  end
+  
+### /My config ###
+
+### My provision ###
+  
+  config.vm.provision "provision_once", type: "shell", run: "once", path: "provision_once.sh"
+
+  config.vm.provision "provision_onstart", type: "shell", run: "always", 
+    args: X + " 2_arg 3_arg", 
+    path: "provision_onstart.sh"
+
+### /My provision ###
+
+end

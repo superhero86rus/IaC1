@@ -1,4 +1,4 @@
-# IaC1 день 2
+# IaC1 день 3
 Курс "Инфраструктура как код. Основные инструменты". УЦ "Специалист" 18-20.09.2023
 
 ### Методичка
@@ -59,4 +59,78 @@ ENTRYPOINT ["/start.sh"]
 docker build -t test/webd .
 
 docker run --name webd01 --hostname webd01 -itd -v /var/www/:/var/www/ -p 8000:80 test/webd
+
+# Если нужен рандомный порт, тогда ключ -P
 ```
+
+### Docker Compose поднимет 3 контейнера
+```bash
+version: "3"
+services:
+  webd:
+    image: server.corp8.un:5000/student/webd:1.1
+    ports:
+      - "80"
+    volumes:
+      - /var/www/:/var/www/
+    deploy:
+      mode: replicated
+      replicas: 3
+```
+
+### Kubernetes
+```bash
+
+# Скачивание minikube
+apt install -y curl wget apt-transport-https
+wget https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+mv minikube-linux-amd64 /usr/local/bin/minikube
+chmod +x /usr/local/bin/minikube
+
+# Установка от неприлигированного пользователя (gitlab-runner)
+time minikube start --driver=docker --insecure-registry "server.corp8.un:5000"
+
+# ALIAS kubectl чтобы было единообразие k8s и minikube
+alias kubectl='minikube kubectl --'
+```
+
+#### Replica Set - ревностно наблюдает чтобы кол-во подов было заявленным. При падении любого пода - новый автоматически поднимется
+
+#### Service - про то, как воспользоваться нашим приложением? Указываем порты и метки подов в yaml-конфигурации
+
+### NGINX
+```bash
+    # Проксируем адрес webd.corp8.un в наш куб-кластер
+    server {
+        listen 80;
+        server_name webd.corp8.un;
+
+        location / {
+            proxy_pass http://192.168.49.2:30111/;
+        }
+    }
+    server {
+        listen 80;
+        server_name mail.corp8.un;
+
+        location / {
+            proxy_pass http://server.corp8.un:81/mail/;
+        }
+    }
+    server {
+        listen 80;
+        server_name corp8.un www.corp8.un;
+
+        location / {
+            proxy_pass http://server.corp8.un:81/;
+        }
+    }
+```
+
+### Terraform можно настроить для локального Virtual Box
+### HashiCorp Packer - сборка образов для Vagrant Cloud
+### Vegeta - приложение для подачи нагрузки для тестирования балансировки
+### Helm - шаблонизатор для Kubernetes
+
+### Werf - deploy в Kubernetes от Flant
+https://tproger.ru/articles/kubernetes-node-js-werf

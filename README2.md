@@ -86,3 +86,13 @@ wget https://val.bmstu.ru/unix/conf.git/conf/ansible/roles/openvpn1.tgz && tar -
 # Или сброс пароля командой
 sudo gitlab-rake "gitlab:password:reset"
 ```
+
+### keepalived - балансировщик
+```bash
+apt install keepalived
+systemctl enable keepalived
+systemctl start keepalived
+```
+
+### Описание CI/CD/CDP
+https://solanteq.ru/blog/ci-cd-или-как-ускорить-сборку-кода-и-сэконо/
